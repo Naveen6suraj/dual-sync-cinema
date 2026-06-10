@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cyberpunk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DualSync Cinema Pro - Cyberpunk Gaming Watch Party</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Orbitron:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Hls.js for High-Res Adaptive Bitrate streaming -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+    <!-- Real-time dynamic ambient glow backplate -->
+    <div class="ambient-glow" id="ambient-glow"></div>
+    <canvas id="ambient-canvas" style="display: none;"></canvas>
+
+    <!-- 1. Cinematic Intro Boot Overlay -->
+    <div id="intro-screen" class="cyber-intro">
+        <div class="intro-grid"></div>
+        <div class="intro-content">
+            <div class="cyber-badge">SYSTEMS BOOTING v3.4.1</div>
+            <h1 class="glitch-title" data-text="DUALSYNC CINEMA PRO">DUALSYNC CINEMA PRO</h1>
+            <p class="intro-subtext">Watch Together. Perfectly Synced. Movies, YouTube, Streams, and Voice Chat in One Place.</p>
+            
+            <div class="poster-preview-row">
+                <div class="preview-card" style="background-image: url('images/cyberpunk.png')">
+                    <div class="glow-border"></div>
+                </div>
+                <div class="preview-card" style="background-image: url('images/scifi.png')">
+                    <div class="glow-border"></div>
+                </div>
+                <div class="preview-card" style="background-image: url('images/horror.png')">
+                    <div class="glow-border"></div>
+                </div>
+            </div>
+
+            <button class="btn-launch" id="btn-launch-theater">
+                <span class="launch-text">INITIALIZE THEATER</span>
+                <span class="btn-glimmer"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Gamer Dashboard Layout -->
+    <div class="app-layout" id="app-layout" style="opacity: 0; pointer-events: none;">
+        
+        <!-- Left Sidebar: Discord-Inspired Icon Navigation -->
+        <aside class="cyber-sidebar">
+            <div class="sidebar-logo">
+                <i class="fa-solid fa-wand-magic-sparkles logo-glow"></i>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-item active" data-tab="watch-party" title="Watch Party Room">
+                    <i class="fa-solid fa-clapperboard"></i>
+                    <span class="nav-indicator"></span>
+                </div>
+                <div class="nav-item" data-tab="movies" title="Movie Library">
+                    <i class="fa-solid fa-film"></i>
+                    <span class="nav-indicator"></span>
+                </div>
+                <div class="nav-item" data-tab="youtube" title="YouTube Theater">
+                    <i class="fa-brands fa-youtube"></i>
+                    <span class="nav-indicator"></span>
+                </div>
+                <div class="nav-divider"></div>
+                <div class="nav-item" data-tab="voice-chat" title="Voice Channels">
+                    <i class="fa-solid fa-headphones-simple"></i>
+                    <span class="nav-indicator"></span>
+                </div>
+                <div class="nav-item" data-tab="friends" title="Friends List">
+                    <i class="fa-solid fa-user-group"></i>
+                    <span class="nav-badge">3</span>
+                    <span class="nav-indicator"></span>
+                </div>
+                <div class="nav-item" data-tab="settings" title="Gamer Controls">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span class="nav-indicator"></span>
+                </div>
+            </nav>
+            
+            <div class="sidebar-profile">
+                <div class="profile-avatar online">
+                    <span>N</span>
+                    <span class="status-dot"></span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Side: Navigation Dashboard Area -->
+        <div class="main-viewport">
+            
+            <!-- Top HUD Bar: Gaming HUD Overlay -->
+            <header class="hud-header">
+                <div class="hud-title-section">
+                    <span class="hud-room-code">ROOM // DUAL-PAIRING-PRO</span>
+                    <h2 id="current-viewport-title">WATCH PARTY ROOM</h2>
+                </div>
+                
+                <div class="hud-stats-section">
+                    <div class="hud-chip">
+                        <span class="chip-label">SYNC SCORE</span>
+                        <span class="chip-value text-cyan" id="sync-score-val">100%</span>
+                    </div>
+                    <div class="hud-chip">
+                        <span class="chip-label">LATENCY</span>
+                        <span class="chip-value text-purple">12ms</span>
+                    </div>
+                    <!-- Audio Permission Status Badge -->
+                    <div class="hud-permission-badge" id="permission-status">
+                        <span class="dot red"></span>
+                        <span class="status-text">Audio Permission Required</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Inner Layout Grid -->
+            <div class="viewport-content">
+                
+                <!-- Center Area: Theater Screen + Library + Tab views -->
+                <div class="content-left">
+                    
+                    <!-- Tab Panel 1: Watch Party Room (Default) -->
+                    <div class="tab-panel active" id="panel-watch-party">
+                        <!-- Main Cinematic Video Stage -->
+                        <div class="glass-card video-card">
+                            <div class="video-container" id="drop-zone">
+                                <video id="movie-player" playsinline crossorigin="anonymous">
+                                    <!-- Fallback source -->
+                                    <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <audio id="secondary-audio" style="display: none;"></audio>
+                                <div id="youtube-player" style="display: none; width: 100%; height: 100%; pointer-events: none;"></div>
+                                
+                                <!-- File Drag/Drop initial overlay -->
+                                <div class="video-overlay" id="video-overlay">
+                                    <div class="overlay-glow"></div>
+                                    <div class="overlay-content">
+                                        <i class="fa-solid fa-circle-play cinematic-play-icon"></i>
+                                        <h2>DRAG & DROP MOVIE FILE</h2>
+                                        <p>Supports H.264 MP4, WebM, local streams, and adaptive HLS playlists</p>
+                                        
+                                        <div class="btn-hud-group">
+                                            <label for="file-input" class="cyber-btn cyber-btn-primary">
+                                                <i class="fa-solid fa-file-video"></i> SELECT VIDEO
+                                            </label>
+                                            <input type="file" id="file-input" accept="video/*" style="display: none;">
+                                            <button class="cyber-btn cyber-btn-secondary" id="load-demo-btn">
+                                                <i class="fa-solid fa-play"></i> PLAY TRAILER
+                                            </button>
+                                        </div>
+
+                                        <div class="url-deck">
+                                            <input type="text" id="stream-url-input" placeholder="Or paste video/youtube stream URL...">
+                                            <button class="cyber-btn cyber-btn-primary" id="load-url-btn">LOAD URL</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Floating Custom Video Controls -->
+                                <div class="custom-controls" id="custom-controls">
+                                    <div class="progress-bar-container" id="progress-container">
+                                        <div class="progress-bar" id="progress-bar"></div>
+                                        <div class="progress-hover" id="progress-hover"></div>
+                                    </div>
+                                    
+                                    <div class="controls-row">
+                                        <div class="controls-left">
+                                            <button class="control-btn" id="play-pause-btn" title="Play/Pause (Space)">
+                                                <i class="fa-solid fa-play"></i>
+                                            </button>
+                                            <button class="control-btn" id="stop-btn" title="Stop Movie">
+                                                <i class="fa-solid fa-stop"></i>
+                                            </button>
+                                            <span class="time-display" id="time-display">00:00 / 00:00</span>
+                                        </div>
+                                        
+                                        <div class="controls-right">
+                                            <!-- Theme Switcher Hud Widget -->
+                                            <div class="theme-selector-hud" title="Change Theme Style">
+                                                <button class="theme-pill" data-theme="cyberpunk" style="background: var(--accent-purple);"></button>
+                                                <button class="theme-pill" data-theme="scifi" style="background: var(--accent-blue);"></button>
+                                                <button class="theme-pill" data-theme="horror" style="background: var(--accent-red);"></button>
+                                            </div>
+                                            <button class="control-btn" id="fs-btn" title="Fullscreen Mode">
+                                                <i class="fa-solid fa-expand"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="movie-meta-bar">
+                                <div class="meta-titles">
+                                    <h3 id="movie-title">Demo Trailer: Big Buck Bunny</h3>
+                                    <p id="movie-meta">High-Res Adaptive Bitrate HLS Stream</p>
+                                </div>
+                                <div class="meta-indicators">
+                                    <div id="youtube-warning" style="display: none;">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                        <span>YouTube Direct Default Route active (Discrete multi-device splits disabled).</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Advanced VLC Console Control Center -->
+                        <div class="glass-card vlc-console">
+                            <div class="vlc-header">
+                                <i class="fa-solid fa-sliders-h header-neon-icon"></i>
+                                <h3>VLC STUDIO SYSTEM SETTINGS</h3>
+                            </div>
+                            
+                            <div class="vlc-grid">
+                                <!-- Column 1: Subtitles Studio -->
+                                <div class="vlc-panel">
+                                    <h4 class="neon-title-purple"><i class="fa-regular fa-closed-captioning"></i> SUBTITLE ADVANCED SETTINGS</h4>
+                                    
+                                    <div class="file-uploader-box">
+                                        <label for="sub-file-input" class="uploader-label">
+                                            <i class="fa-solid fa-upload"></i> LOAD SUBTITLES (.SRT / .VTT)
+                                        </label>
+                                        <input type="file" id="sub-file-input" accept=".srt,.vtt" style="display: none;">
+                                        <div id="sub-file-name">No subtitles file loaded</div>
+                                    </div>
+
+                                    <div class="hud-slider-group">
+                                        <div class="hud-slider-header">
+                                            <span>SUBTITLE TIMING OFFSET</span>
+                                            <span class="hud-slider-val text-cyan" id="sub-delay-display">0.0s</span>
+                                        </div>
+                                        <div class="hud-slider-controls">
+                                            <button class="btn-micro" id="sub-delay-minus">-0.1s</button>
+                                            <input type="range" id="sub-delay-slider" min="-5" max="5" step="0.1" value="0">
+                                            <button class="btn-micro" id="sub-delay-plus">+0.1s</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="hud-slider-group">
+                                        <div class="hud-slider-header">
+                                            <span>SUBTITLE TEXT SCALING</span>
+                                            <span class="hud-slider-val text-purple" id="sub-size-display">20px</span>
+                                        </div>
+                                        <input type="range" id="sub-size-slider" min="14" max="32" step="1" value="20" class="slider-fill-purple">
+                                    </div>
+                                </div>
+
+                                <!-- Column 2: Dual-Language Audio Route & Embedded Tracks -->
+                                <div class="vlc-panel">
+                                    <h4 class="neon-title-cyan"><i class="fa-solid fa-language"></i> MULTI-TRACK CONTROLS</h4>
+                                    
+                                    <!-- Dynamic Embedded Tracks (Local/HLS) -->
+                                    <div class="embedded-tracks-selector" style="margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                                        <div class="hud-select-group">
+                                            <label class="select-label" style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem; display: block;">Embedded Audio Track</label>
+                                            <select id="embedded-audio-select" class="device-select" style="width: 100%;">
+                                                <option value="-1">Default / Track 1</option>
+                                            </select>
+                                        </div>
+                                        <div class="hud-select-group">
+                                            <label class="select-label" style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem; display: block;">Embedded Video Track / Quality</label>
+                                            <select id="embedded-video-select" class="device-select" style="width: 100%;">
+                                                <option value="-1">Default / Auto</option>
+                                            </select>
+                                        </div>
+                                        <div class="chrome-flag-tip" style="font-size: 0.65rem; color: var(--text-muted); line-height: 1.3; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.05); padding: 0.5rem; rounded: 4px;">
+                                            <span style="color: var(--accent-blue); font-weight: bold;">Chromium Tip:</span> For local multi-audio files, enable Chrome's flag: <code>chrome://flags/#enable-experimental-web-platform-features</code>
+                                        </div>
+                                    </div>
+
+                                    <h5 class="neon-title-cyan" style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-cyan); margin-bottom: 0.5rem; display: block;"><i class="fa-solid fa-file-audio"></i> LOAD EXTERNAL DIALOGUE FILE</h5>
+                                    <p class="vlc-desc" style="font-size: 0.75rem; margin-bottom: 0.75rem;">Or load an external audio file (.mp3, .m4a) to route as a secondary language track.</p>
+                                    
+                                    <div class="file-uploader-box">
+                                        <label for="audio-file-input" class="uploader-label">
+                                            <i class="fa-solid fa-file-audio"></i> LOAD DIALOGUE FILE
+                                        </label>
+                                        <input type="file" id="audio-file-input" accept="audio/*" style="display: none;">
+                                        <div id="audio-file-name">No secondary dialogue track loaded</div>
+                                    </div>
+
+                                    <div class="audio-sync-status" id="audio-sync-status" style="display: none;">
+                                        <span class="pulse-indicator-cyan"></span>
+                                        <span class="status-msg-cyan">Dialogue Clock Auto-Compensating</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Panel 2: Movie Selection Library (Netflix style) -->
+                    <div class="tab-panel" id="panel-movies">
+                        <div class="library-header">
+                            <h3>TRENDING MOVIE SHELVES</h3>
+                            <p>Select a video card to watch or hover to preview trailers.</p>
+                        </div>
+                        
+                        <div class="movie-shelves-container">
+                            <h4 class="shelf-category">CONTINUE WATCHING</h4>
+                            <div class="movie-row">
+                                <div class="movie-card" data-url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4" style="background-image: url('images/cyberpunk.png')">
+                                    <div class="card-glow-overlay"></div>
+                                    <div class="card-details">
+                                        <h5>DUALSYNC 2099</h5>
+                                        <p>Cyberpunk Cinema • 1080p</p>
+                                    </div>
+                                </div>
+                                <div class="movie-card" data-url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" style="background-image: url('images/scifi.png')">
+                                    <div class="card-glow-overlay"></div>
+                                    <div class="card-details">
+                                        <h5>COSMIC DRIFT</h5>
+                                        <p>Sci-Fi Space • 4K HDR</p>
+                                    </div>
+                                </div>
+                                <div class="movie-card" data-url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4" style="background-image: url('images/horror.png')">
+                                    <div class="card-glow-overlay"></div>
+                                    <div class="card-details">
+                                        <h5>THE SHADOWED CORRIDOR</h5>
+                                        <p>Horror Suspense • 1080p</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h4 class="shelf-category" style="margin-top: 2rem;">POPULAR CHANNELS</h4>
+                            <div class="movie-row">
+                                <div class="movie-card" data-url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" style="background-image: linear-gradient(135deg, #1e1b4b, #311042)">
+                                    <div class="card-glow-overlay"></div>
+                                    <div class="card-details">
+                                        <h5>ELEPHANTS DREAM</h5>
+                                        <p>Fantasy Surreal • 1080p</p>
+                                    </div>
+                                </div>
+                                <div class="movie-card" data-url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" style="background-image: linear-gradient(135deg, #0f172a, #1e293b)">
+                                    <div class="card-glow-overlay"></div>
+                                    <div class="card-details">
+                                        <h5>BIG BUCK BUNNY</h5>
+                                        <p>Animated Demo • HLS</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Panel 3: YouTube Theater Sync tab -->
+                    <div class="tab-panel" id="panel-youtube">
+                        <div class="youtube-dashboard">
+                            <div class="yt-header-box">
+                                <i class="fa-brands fa-youtube yt-red-icon"></i>
+                                <h3>YOUTUBE THEATER DECK</h3>
+                            </div>
+                            
+                            <div class="yt-input-area">
+                                <div class="yt-form-group">
+                                    <label>PASTE YOUTUBE VIDEO LINK OR SHORTS URL</label>
+                                    <div class="yt-input-row">
+                                        <input type="text" id="youtube-tab-url" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+                                        <button class="cyber-btn cyber-btn-primary" id="youtube-tab-load-btn">LOAD VIDEO</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="yt-quick-grid">
+                                <h4 class="quick-title">POPULAR GAMING PRESETS</h4>
+                                <div class="yt-presets-row">
+                                    <div class="yt-preset-card" data-id="dQw4w9WgXcQ">
+                                        <div class="yt-preset-thumb" style="background-image: url('https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg')"></div>
+                                        <span>Rick Astley - Never Gonna Give You Up</span>
+                                    </div>
+                                    <div class="yt-preset-card" data-id="L_LUpnjgPso">
+                                        <div class="yt-preset-thumb" style="background-image: url('https://img.youtube.com/vi/L_LUpnjgPso/mqdefault.jpg')"></div>
+                                        <span>Cyberpunk 2077 - Official Launch Trailer</span>
+                                    </div>
+                                    <div class="yt-preset-card" data-id="gKfnDzL0gOk">
+                                        <div class="yt-preset-thumb" style="background-image: url('https://img.youtube.com/vi/gKfnDzL0gOk/mqdefault.jpg')"></div>
+                                        <span>Unreal Engine 5.4 - Next-Gen Graphics Demo</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Area: Discord Voice Chat & Listener Mixer HUD -->
+                <div class="content-right">
+                    
+                    <!-- Voice Chat & Active Lobby Members -->
+                    <div class="glass-card lobby-card">
+                        <div class="lobby-header">
+                            <div class="header-title">
+                                <i class="fa-solid fa-volume-high text-cyan"></i>
+                                <h4>VOICE CHANNEL: THEATER_01</h4>
+                            </div>
+                            <span class="voice-badge">P2P MESH</span>
+                        </div>
+                        
+                        <!-- Room Members List with Speaking indicators -->
+                        <div class="lobby-members" id="voice-chat-users">
+                            <!-- User 1: You (Host) -->
+                            <div class="user-bubble me" id="user-bubble-me">
+                                <div class="avatar-ring speaking">
+                                    <div class="user-avatar" style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));">N</div>
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-name">Naveen (You) <span class="badge-host">HOST</span></div>
+                                    <div class="user-status text-green"><i class="fa-solid fa-eye"></i> Watching</div>
+                                </div>
+                                <div class="user-telemetry">
+                                    <span class="user-ping">9ms</span>
+                                    <i class="fa-solid fa-microphone mic-active"></i>
+                                </div>
+                            </div>
+
+                            <!-- User 2: Sarah (Simulated Partner) -->
+                            <div class="user-bubble speaking" id="user-bubble-sarah">
+                                <div class="avatar-ring" id="ring-sarah">
+                                    <div class="user-avatar" style="background: #a855f7;">S</div>
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-name">Sarah</div>
+                                    <div class="user-status text-green"><i class="fa-solid fa-eye"></i> Watching</div>
+                                </div>
+                                <div class="user-telemetry">
+                                    <span class="user-ping">24ms</span>
+                                    <i class="fa-solid fa-microphone mic-active" id="mic-sarah"></i>
+                                </div>
+                            </div>
+
+                            <!-- User 3: Dave (Simulated Partner) -->
+                            <div class="user-bubble" id="user-bubble-dave">
+                                <div class="avatar-ring" id="ring-dave">
+                                    <div class="user-avatar" style="background: #3b82f6;">D</div>
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-name">Dave</div>
+                                    <div class="user-status text-cyan"><i class="fa-solid fa-arrows-spin"></i> Syncing</div>
+                                </div>
+                                <div class="user-telemetry">
+                                    <span class="user-ping">112ms</span>
+                                    <i class="fa-solid fa-microphone-slash mic-muted"></i>
+                                </div>
+                            </div>
+
+                            <!-- User 4: Keanu (Simulated Partner) -->
+                            <div class="user-bubble" id="user-bubble-keanu">
+                                <div class="avatar-ring" id="ring-keanu">
+                                    <div class="user-avatar" style="background: #f43f5e;">K</div>
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-name">Keanu</div>
+                                    <div class="user-status text-purple"><i class="fa-solid fa-pause"></i> Paused</div>
+                                </div>
+                                <div class="user-telemetry">
+                                    <span class="user-ping">14ms</span>
+                                    <i class="fa-solid fa-microphone mic-active" id="mic-keanu"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Active voice channel footer with connect/mute keys -->
+                        <div class="lobby-controls">
+                            <button class="btn-voice-action active" id="btn-toggle-mic" title="Mute Microphone">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+                            <button class="btn-voice-action active" id="btn-toggle-deaf" title="Deafen Audio">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                            <button class="btn-voice-action disconnect" id="btn-disconnect-voice" title="Disconnect Voice Chat">
+                                <i class="fa-solid fa-phone-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dual-Pairing Multi-Bluetooth Mixer Console -->
+                    <div class="glass-card mixer-card">
+                        <div class="mixer-header">
+                            <div class="header-title">
+                                <i class="fa-solid fa-sliders text-purple"></i>
+                                <h4>LISTENER AUDIO MIXER</h4>
+                            </div>
+                            <button class="cyber-btn-sm cyber-btn-primary" id="add-listener-btn">
+                                <i class="fa-solid fa-plus"></i> ADD
+                            </button>
+                        </div>
+
+                        <!-- Listeners container where listener-tracks get appended -->
+                        <div class="listeners-container" id="listeners-list">
+                            <!-- Listener tracks dynamically generated in app.js -->
+                        </div>
+
+                        <!-- Setup Bluetooth Scanning Trigger Card -->
+                        <div class="setup-helper-card" id="setup-card">
+                            <i class="fa-solid fa-headphones-simple headphones-pulse"></i>
+                            <h5>BLUETOOTH PAIRING MANAGER</h5>
+                            <p>Browsers require temporary microphone activation to expose Bluetooth hardware names.</p>
+                            <button class="cyber-btn cyber-btn-primary btn-block" id="grant-permission-btn">SCAN SYSTEM OUTPUTS</button>
+                        </div>
+
+                        <!-- Dynamic Sync Calibration Wizard -->
+                        <div class="calibration-hud">
+                            <div class="cal-header">
+                                <div class="cal-title">
+                                    <span class="pulse-indicator-purple"></span>
+                                    <h5>AV CALIBRATION WIZARD</h5>
+                                </div>
+                                <button class="btn-micro" id="calibrator-toggle">
+                                    <i class="fa-solid fa-toggle-off"></i> START
+                                </button>
+                            </div>
+                            <div class="cal-body">
+                                <div class="cal-box" id="calibrator-flash">
+                                    <span class="cal-cue">SYNC</span>
+                                </div>
+                                <p class="cal-instructions">Adjust headset delay (ms) until beeps match the visual blink.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diagnostics Logs (Collapsible) -->
+                    <div class="glass-card diagnostics-card">
+                        <div class="diag-header" id="diagnostics-toggle">
+                            <div class="header-title">
+                                <i class="fa-solid fa-bug text-cyan"></i>
+                                <h4>DIAGNOSTICS & TELEMETRY</h4>
+                            </div>
+                            <i class="fa-solid fa-chevron-down" id="diagnostics-chevron"></i>
+                        </div>
+                        
+                        <div class="diagnostics-body" id="diagnostics-body" style="display: none;">
+                            <div class="diag-item">
+                                <span class="diag-key">HTTPS/SECURE CONTEXT:</span>
+                                <span class="diag-val" id="diag-secure">Checking...</span>
+                            </div>
+                            <div class="diag-item">
+                                <span class="diag-key">OUTPUT TARGETING:</span>
+                                <span class="diag-val" id="diag-setsinkid">Checking...</span>
+                            </div>
+                            <div class="diag-item">
+                                <span class="diag-key">AUDIO PERMISSION:</span>
+                                <span class="diag-val" id="diag-perm">Checking...</span>
+                            </div>
+                            
+                            <div class="diag-raw-map">
+                                <span>HARDWARE DEVICES LOGS:</span>
+                                <pre id="diag-devices-raw"></pre>
+                            </div>
+                            
+                            <button class="cyber-btn cyber-btn-secondary btn-block" id="diag-refresh-btn">REFRESH LOGS</button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Modal: Add New Listener -->
+    <div class="modal-overlay" id="add-listener-modal">
+        <div class="cyber-modal glass-card">
+            <div class="modal-border-glow"></div>
+            <h3>INITIALIZE LISTENERS</h3>
+            
+            <div class="cyber-input-group">
+                <label for="new-listener-name">Enter listener name tag</label>
+                <input type="text" id="new-listener-name" placeholder="e.g. Sarah, Dave" autocomplete="off">
+            </div>
+            
+            <div class="modal-actions">
+                <button class="cyber-btn cyber-btn-secondary" id="modal-cancel-btn">CANCEL</button>
+                <button class="cyber-btn cyber-btn-primary" id="modal-confirm-btn">ALLOCATE TRACK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

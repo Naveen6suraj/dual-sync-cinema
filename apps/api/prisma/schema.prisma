@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  roomsHosted     Room[]          @relation("HostRooms")
+  watchHistory    WatchHistory[]
+  syncProfiles    SyncProfile[]
+  friendships     Friendship[]    @relation("UserFriends")
+  friendOf        Friendship[]    @relation("FriendUsers")
+}
+
+model Room {
+  id          String   @id @default(uuid())
+  name        String
+  password    String?
+  hostId      String
+  host        User     @relation("HostRooms", fields: [hostId], references: [id])
+  mediaUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  history     WatchHistory[]
+}
+
+model WatchHistory {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id])
+  joinedAt  DateTime @default(now())
+  leftAt    DateTime?
+}
+
+model SyncProfile {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  deviceName       String
+  delayOffsetMs    Int      @default(0)
+  prefAudioLang    String?
+  prefSubtitleLang String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Friendship {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("UserFriends", fields: [userId], references: [id])
+  friendId  String
+  friend    User     @relation("FriendUsers", fields: [friendId], references: [id])
+  status    String   @default("pending") // pending, accepted, blocked
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, friendId])
+}
