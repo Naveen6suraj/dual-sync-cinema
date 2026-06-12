@@ -233,7 +233,23 @@ export default function CinemaRoom({ roomId, userId, userName, isHost }: CinemaR
                     {activeTab === 'movies' && (
                         <div className="glass-card p-6 flex flex-col gap-4">
                             <h3 className="font-hud text-lg font-bold text-white">Local Media Deck</h3>
-                            <div className="border-2 border-dashed border-purple-500/30 rounded-xl p-10 flex flex-col items-center justify-center text-center hover:border-purple-500/60 hover:bg-purple-500/5 transition cursor-pointer">
+                            <div 
+                                className="border-2 border-dashed border-purple-500/30 rounded-xl p-10 flex flex-col items-center justify-center text-center hover:border-purple-500/60 hover:bg-purple-500/5 transition cursor-pointer"
+                                onDragOver={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                }}
+                                onDrop={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const file = e.dataTransfer.files?.[0];
+                                    if (file) {
+                                        setLocalFile(file);
+                                        setMediaUrl(URL.createObjectURL(file));
+                                        setMediaType('local');
+                                    }
+                                }}
+                            >
                                 <i className="fa-solid fa-file-video text-4xl text-purple-400 mb-4"></i>
                                 <p className="text-white font-bold mb-2">Drop MKV or MP4 files here</p>
                                 <p className="text-xs text-gray-500 mb-4">ffmpeg.wasm will automatically extract tracks</p>
