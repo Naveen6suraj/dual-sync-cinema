@@ -3,6 +3,7 @@ services:
   - type: web
     name: dualsync-api
     env: node
+    plan: free
     buildCommand: npm install
     startCommand: npm start
     rootDir: apps/api
@@ -22,6 +23,7 @@ services:
   # 3. Redis Database for WebSockets
   - type: redis
     name: dualsync-redis
+    plan: free
     ipAllowList: [] # only allow internal connections
 
 databases:
@@ -29,3 +31,4 @@ databases:
   - name: dualsync-db
     databaseName: dualsyncdb
     user: dualsyncdb_user
+    plan: free
