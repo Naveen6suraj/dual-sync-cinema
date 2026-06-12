@@ -69,12 +69,46 @@ export default function CinemaRoom({ roomId, userId, userName, isHost }: CinemaR
         }
     };
 
+    const [isIdle, setIsIdle] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const playerWrapperRef = useRef<HTMLDivElement | null>(null);
+
+    const handleMouseMove = () => {
+        setIsIdle(false);
+        if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+        idleTimerRef.current = setTimeout(() => setIsIdle(true), 3000);
+    };
+
+    const handleMouseLeave = () => {
+        setIsIdle(true);
+        if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+
+    const toggleFullscreen = () => {
+        const wrapper = playerWrapperRef.current;
+        if (!wrapper) return;
+
+        if (!document.fullscreenElement) {
+            wrapper.requestFullscreen().catch(err => console.error(err));
+            setIsFullscreen(true);
+        } else {
+            document.exitFullscreen().catch(err => console.error(err));
+            setIsFullscreen(false);
+        }
+    };
+
     const renderPlayer = () => {
         if (!mediaType || !mediaUrl) return null;
 
         return (
-            <div className="rounded-2xl border border-purple-500/10 bg-black/40 overflow-hidden shadow-2xl relative mt-6">
-                <div className="relative aspect-video">
+            <div 
+                ref={playerWrapperRef}
+                className="rounded-2xl border border-purple-500/10 bg-black/40 overflow-hidden shadow-2xl relative mt-6"
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+            >
+                <div className={`relative ${isFullscreen ? 'w-screen h-screen' : 'aspect-video'}`}>
                     {mediaType === 'youtube' ? (
                         <YouTubePlayer 
                             url={mediaUrl}
@@ -116,14 +150,19 @@ export default function CinemaRoom({ roomId, userId, userName, isHost }: CinemaR
                         onSeek={handleSeek}
                         hudTheme={hudTheme}
                         setHudTheme={setHudTheme as (theme: string) => void}
+                        isIdle={isIdle}
+                        toggleFullscreen={toggleFullscreen}
+                        isFullscreen={isFullscreen}
                     />
                 </div>
-                <div className="p-5 border-t border-purple-500/5 bg-white/[0.01] flex justify-between items-center">
-                    <div>
-                        <h3 className="font-semibold text-md text-white">Current Media</h3>
-                        <p className="text-xs text-gray-500 font-mono truncate max-w-lg">{mediaUrl}</p>
+                {!isFullscreen && (
+                    <div className="p-5 border-t border-purple-500/5 bg-white/[0.01] flex justify-between items-center">
+                        <div>
+                            <h3 className="font-semibold text-md text-white">Current Media</h3>
+                            <p className="text-xs text-gray-500 font-mono truncate max-w-lg">{mediaUrl}</p>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         );
     };

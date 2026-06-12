@@ -25,10 +25,13 @@ export default function PlayerControls({
     onPlayPause,
     onSeek,
     hudTheme,
-    setHudTheme
-}: PlayerControlsProps) {
+    setHudTheme,
+    isIdle,
+    toggleFullscreen,
+    isFullscreen
+}: PlayerControlsProps & { isIdle?: boolean, toggleFullscreen?: () => void, isFullscreen?: boolean }) {
     return (
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 flex flex-col gap-2 opacity-0 hover:opacity-100 transition-opacity duration-300 z-10">
+        <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 flex flex-col gap-2 transition-opacity duration-500 z-10 ${isIdle ? 'opacity-0' : 'opacity-100'}`}>
             <input 
                 type="range" 
                 min={0} 
@@ -59,6 +62,11 @@ export default function PlayerControls({
                     <div className={`px-2 py-1 rounded text-[10px] font-bold tracking-wider border ${isHost ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' : 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'}`}>
                         {isHost ? 'HOST ACTIVE' : 'CLIENT SYNCING'}
                     </div>
+                    {toggleFullscreen && (
+                        <button onClick={toggleFullscreen} className="text-gray-400 hover:text-white transition px-2">
+                            <i className={`fa-solid ${isFullscreen ? 'fa-compress' : 'fa-expand'}`}></i>
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
