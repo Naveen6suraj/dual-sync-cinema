@@ -130,7 +130,7 @@ export default function CinemaRoom({ roomId, userId, userName, isHost }: CinemaR
 
     return (
         <div 
-            className="flex min-h-screen bg-[#050508] text-[#ecebf0] font-sans overflow-hidden relative"
+            className={`flex min-h-screen ${hudTheme === 'scifi' ? 'bg-[#020617] text-gray-100' : hudTheme === 'horror' ? 'bg-[#09090b] text-zinc-100' : 'bg-[#050508] text-gray-100'} overflow-hidden relative font-sans flex-col md:flex-row pb-16 md:pb-0`}
             data-theme={hudTheme}
         >
             <div 
@@ -142,7 +142,7 @@ export default function CinemaRoom({ roomId, userId, userName, isHost }: CinemaR
             <SidebarNav activeTab={activeTab as "movies" | "youtube"} setActiveTab={setActiveTab as (tab: string) => void} userName={userName} />
 
             <div className="flex-grow flex flex-col h-screen overflow-y-auto relative z-1">
-                <header className="h-[70px] border-b border-purple-500/10 bg-[#050508]/50 backdrop-blur-md flex justify-between items-center px-8 sticky top-0 z-10">
+                <header className="h-[70px] border-b border-purple-500/10 bg-[#050508]/50 backdrop-blur-md flex justify-between items-center px-4 md:px-8 sticky top-0 z-10 shrink-0">
                     <div>
                         <span className="font-mono text-[9px] text-cyan-400 tracking-wider">ROOM // {roomId}</span>
                         <h2 className="font-hud text-sm font-bold tracking-wide text-white uppercase">{activeTab}</h2>

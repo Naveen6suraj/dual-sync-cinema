@@ -8,12 +8,12 @@ interface SidebarNavProps {
 
 export default function SidebarNav({ activeTab, setActiveTab, userName }: SidebarNavProps) {
     return (
-        <aside className="w-[76px] bg-[#05040a] border-r border-purple-500/10 flex flex-col items-center py-5 z-10 shrink-0">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-cyan-500 flex items-center justify-center mb-6 shadow-lg shadow-purple-500/20">
-                <i className="fa-solid fa-wand-magic-sparkles text-white text-lg"></i>
+        <aside className="w-full md:w-[76px] h-[65px] md:h-auto bg-[#05040a] border-t md:border-r border-purple-500/10 flex flex-row md:flex-col items-center py-0 md:py-5 px-4 md:px-0 z-20 shrink-0 fixed md:relative bottom-0 left-0 justify-between md:justify-start">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-tr from-purple-600 to-cyan-500 flex items-center justify-center md:mb-6 shadow-lg shadow-purple-500/20 hidden md:flex">
+                <i className="fa-solid fa-wand-magic-sparkles text-white md:text-lg"></i>
             </div>
             
-            <nav className="flex flex-col gap-3 items-center w-full flex-grow">
+            <nav className="flex flex-row md:flex-col gap-6 md:gap-3 items-center w-auto md:w-full md:flex-grow">
                 <div 
                     className={`w-12 h-12 flex items-center justify-center cursor-pointer relative transition-all duration-200 group ${activeTab === 'movies' ? 'bg-purple-600 text-white rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.4)]' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white hover:rounded-xl rounded-full'}`}
                     onClick={() => setActiveTab('movies')}

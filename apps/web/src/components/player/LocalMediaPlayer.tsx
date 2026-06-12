@@ -34,6 +34,7 @@ export default function LocalMediaPlayer({
     const { isLoaded, load, extractSubtitles, isProcessing, progress } = useFFmpeg();
     const [subtitleUrl, setSubtitleUrl] = useState<string | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const [objectFit, setObjectFit] = useState<'contain' | 'cover' | 'fill'>('contain');
 
     // Sync state
     useEffect(() => {
@@ -117,6 +118,11 @@ export default function LocalMediaPlayer({
                     e.preventDefault();
                     video.volume = Math.max(0, video.volume - 0.05);
                     break;
+                case 'c':
+                case 'C':
+                    e.preventDefault();
+                    setObjectFit(prev => prev === 'contain' ? 'cover' : prev === 'cover' ? 'fill' : 'contain');
+                    break;
                 case 'f':
                 case 'F':
                     // Do not preventDefault on 'f' as it can break user-gesture trust in some browsers
@@ -161,7 +167,7 @@ export default function LocalMediaPlayer({
             )}
             <video 
                 ref={videoRef}
-                className="w-full h-full object-contain pointer-events-none"
+                className={`w-full h-full object-${objectFit} pointer-events-none transition-all duration-300`}
                 src={fileUrl}
                 playsInline
                 crossOrigin="anonymous"

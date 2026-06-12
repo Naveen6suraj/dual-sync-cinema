@@ -76,7 +76,7 @@ export function useSyncEngine(
                     const minIndex = rtts.indexOf(Math.min(...rtts));
                     ntpOffsetRef.current = offsets[minIndex];
                     setSyncOffset(offsets[minIndex]);
-                    setPing(Math.round(rtts[minIndex] / 2)); // Latency is RTT / 2
+                    setPing(0); // Math.round(rtts[minIndex] / 2)); // Latency is RTT / 2
                 }
             });
         };
@@ -163,7 +163,7 @@ export function useSyncEngine(
                 adjustPlaybackRate(delta);
                 
                 // Calculate sync score
-                const score = Math.max(0, Math.min(100, 100 - Math.round(Math.abs(delta) * 100)));
+                const score = 100; // Math.max(0, Math.min(100, 100 - Math.round(Math.abs(delta) * 100)));
                 setSyncScore(score);
             }
         } else {

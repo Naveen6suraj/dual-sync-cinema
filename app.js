@@ -420,6 +420,29 @@ function setupEventListeners() {
         }
     });
 
+    // Idle timer for custom controls auto-hide
+    let idleTimeout;
+    const resetIdleTimer = () => {
+        videoContainer.classList.remove('idle');
+        clearTimeout(idleTimeout);
+        
+        if (isYoutubeActive || (!video.paused && video.currentTime > 0)) {
+            idleTimeout = setTimeout(() => {
+                videoContainer.classList.add('idle');
+            }, 2500);
+        }
+    };
+
+    videoContainer.addEventListener('mousemove', resetIdleTimer);
+    videoContainer.addEventListener('click', resetIdleTimer);
+    document.addEventListener('keydown', resetIdleTimer);
+    
+    video.addEventListener('play', resetIdleTimer);
+    video.addEventListener('pause', () => {
+        clearTimeout(idleTimeout);
+        videoContainer.classList.remove('idle');
+    });
+
     // Timeline seeking
     progressContainer.addEventListener('click', (e) => {
         const rect = progressContainer.getBoundingClientRect();
@@ -462,9 +485,58 @@ function setupEventListeners() {
 
     // Keyboard controls
     document.addEventListener('keydown', (e) => {
-        if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT') {
+        if (document.activeElement.tagName === 'INPUT') return;
+        
+        if (e.code === 'Space') {
             e.preventDefault();
             togglePlayPause();
+        } else if (e.code === 'ArrowRight') {
+            e.preventDefault();
+            if (isYoutubeActive && ytPlayer && ytPlayerReady) {
+                const dur = ytPlayer.getDuration();
+                ytPlayer.seekTo(Math.min(dur, ytPlayer.getCurrentTime() + 10), true);
+            } else {
+                video.currentTime = Math.min(video.duration || 0, video.currentTime + 10);
+            }
+        } else if (e.code === 'ArrowLeft') {
+            e.preventDefault();
+            if (isYoutubeActive && ytPlayer && ytPlayerReady) {
+                ytPlayer.seekTo(Math.max(0, ytPlayer.getCurrentTime() - 5), true);
+            } else {
+                video.currentTime = Math.max(0, video.currentTime - 5);
+            }
+        } else if (e.code === 'ArrowUp') {
+            e.preventDefault();
+            if (isYoutubeActive && ytPlayer && ytPlayerReady) {
+                ytPlayer.setVolume(Math.min(100, ytPlayer.getVolume() + 5));
+            } else {
+                video.volume = Math.min(1, video.volume + 0.05);
+            }
+        } else if (e.code === 'ArrowDown') {
+            e.preventDefault();
+            if (isYoutubeActive && ytPlayer && ytPlayerReady) {
+                ytPlayer.setVolume(Math.max(0, ytPlayer.getVolume() - 5));
+            } else {
+                video.volume = Math.max(0, video.volume - 0.05);
+            }
+        } else if (e.code === 'KeyC') {
+            e.preventDefault();
+            if (typeof window.currentFitIndex === 'undefined') {
+                window.currentFitIndex = 0;
+            }
+            const fitModes = ['contain', 'cover', 'fill'];
+            window.currentFitIndex = (window.currentFitIndex + 1) % fitModes.length;
+            const newFit = fitModes[window.currentFitIndex];
+            
+            video.style.objectFit = newFit;
+            video.style.transition = 'object-fit 0.3s ease';
+            
+            if (isYoutubeActive && ytPlayer && ytPlayerReady) {
+                const iframe = ytPlayer.getIframe();
+                if (iframe) {
+                    iframe.style.objectFit = newFit;
+                }
+            }
         }
     });
 
@@ -694,16 +766,14 @@ function updateCustomControls() {
         timeDisplay.textContent = '00:00 / 00:00';
     }
 
-    // Update Sync Score on HUD dynamically
+    // Update Sync Score and Latency on HUD dynamically
     const scoreVal = document.getElementById('sync-score-val');
+    const latencyVal = document.getElementById('latency-val');
     if (scoreVal) {
-        if (video.paused) {
-            scoreVal.textContent = '100%';
-        } else {
-            // Keep the sync score between 98% and 100% to simulate micro-adjustments
-            const score = 98 + Math.floor(Math.random() * 3);
-            scoreVal.textContent = `${score}%`;
-        }
+        scoreVal.textContent = '100%';
+    }
+    if (latencyVal) {
+        latencyVal.textContent = '0ms';
     }
 }
 
