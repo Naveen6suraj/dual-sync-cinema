@@ -259,41 +259,37 @@ export default function CinemaRoom({ roomId, userId, userName, isHost }: CinemaR
 
                     {renderPlayer()}
 
-                    {mediaType && (
-                        <>
-                            <DeviceManager 
-                                devices={devices}
-                                listeners={listeners}
-                                addListener={addListener}
-                                removeListener={removeListener}
-                                updateVolume={updateVolume}
-                                updateDelay={updateDelay}
-                                updateDevice={updateDevice}
-                                playCalibrationSound={playCalibrationSound}
-                                saveDeviceProfile={saveDeviceProfile}
-                                userId={userId}
-                            />
+                    <DeviceManager 
+                        devices={devices}
+                        listeners={listeners}
+                        addListener={addListener}
+                        removeListener={removeListener}
+                        updateVolume={updateVolume}
+                        updateDelay={updateDelay}
+                        updateDevice={updateDevice}
+                        playCalibrationSound={playCalibrationSound}
+                        saveDeviceProfile={saveDeviceProfile}
+                        userId={userId}
+                    />
 
-                            <div className="mt-6">
-                                <AudioConsole 
-                                    subtitleDelay={subtitleDelay}
-                                    setSubtitleDelay={setSubtitleDelay}
-                                    subtitleSize={subtitleSize}
-                                    setSubtitleSize={setSubtitleSize}
-                                    onSubtitleUpload={setSubtitleFile}
-                                    subtitleFileName={subtitleFile?.name}
-                                    embeddedAudioTracks={embeddedAudioTracks}
-                                    selectedAudioTrack={selectedAudioTrack}
-                                    setSelectedAudioTrack={setSelectedAudioTrack}
-                                    embeddedVideoTracks={embeddedVideoTracks}
-                                    selectedVideoTrack={selectedVideoTrack}
-                                    setSelectedVideoTrack={setSelectedVideoTrack}
-                                    onSecondaryAudioUpload={setSecondaryAudioFile}
-                                    secondaryAudioFileName={secondaryAudioFile?.name}
-                                />
-                            </div>
-                        </>
-                    )}
+                    <div className="mt-6">
+                        <AudioConsole 
+                            subtitleDelay={subtitleDelay}
+                            setSubtitleDelay={setSubtitleDelay}
+                            subtitleSize={subtitleSize}
+                            setSubtitleSize={setSubtitleSize}
+                            onSubtitleUpload={setSubtitleFile}
+                            subtitleFileName={subtitleFile?.name}
+                            embeddedAudioTracks={embeddedAudioTracks}
+                            selectedAudioTrack={selectedAudioTrack}
+                            setSelectedAudioTrack={setSelectedAudioTrack}
+                            embeddedVideoTracks={embeddedVideoTracks}
+                            selectedVideoTrack={selectedVideoTrack}
+                            setSelectedVideoTrack={setSelectedVideoTrack}
+                            onSecondaryAudioUpload={setSecondaryAudioFile}
+                            secondaryAudioFileName={secondaryAudioFile?.name}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
