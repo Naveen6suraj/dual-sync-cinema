@@ -37,18 +37,30 @@ export default function DeviceManager({
                     <i className="fa-brands fa-bluetooth-b text-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.4)]"></i>
                     <h3 className="font-hud text-xs font-bold tracking-wider text-white">DUAL PAIRING DEVICES <span className="text-gray-500 font-normal">({listeners.length}/5)</span></h3>
                 </div>
-                <div className="flex gap-2">
-                    <input 
-                        type="text" 
-                        value={newDeviceName}
-                        onChange={(e) => setNewDeviceName(e.target.value)}
-                        placeholder="Device Name (e.g. AirPods)"
-                        className="bg-black/50 border border-white/10 rounded px-3 py-1 text-xs text-white outline-none w-48"
-                        onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-                    />
-                    <button onClick={handleAdd} className="bg-emerald-600 hover:bg-emerald-500 px-3 py-1 rounded text-white text-xs font-bold transition">
-                        ADD LISTENER
-                    </button>
+                <div className="flex gap-2 items-center bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+                    <span className="text-xs text-emerald-400 font-bold"><i className="fa-solid fa-plus mr-1"></i> ADD:</span>
+                    <select 
+                        className="bg-black border border-emerald-500/30 rounded px-2 py-1 text-xs text-white outline-none w-56 cursor-pointer"
+                        value=""
+                        onChange={(e) => {
+                            if (e.target.value) {
+                                if (listeners.length >= 5) {
+                                    alert("Maximum 5 devices supported.");
+                                    return;
+                                }
+                                const selectedName = e.target.options[e.target.selectedIndex].text;
+                                addListener(selectedName, e.target.value);
+                            }
+                        }}
+                    >
+                        <option value="" disabled>-- Select Audio Output --</option>
+                        {devices.map(d => (
+                            <option key={d.deviceId} value={d.deviceId}>{d.label || `Bluetooth Device ${d.deviceId.substring(0,4)}`}</option>
+                        ))}
+                        {devices.length === 0 && (
+                            <option value="default">System Default (Grant Permission First!)</option>
+                        )}
+                    </select>
                 </div>
             </div>
 
